@@ -33,13 +33,58 @@ docker run -v $PWD/gambit/yaml_files/:/yaml_files/ -v $PWD/runs/:/runs -it --rm 
 ```
 
 After entering the container, you can run an example scan of the [Wilson coefficients](https://gambitbsm.org/tutorials/TRIUMF/GAMBIT_Tutorial_Part_2.pdf). 
+Change the scan config to save the scan results as `hdf5` with:
+```
+Printer:
+
+  printer: hdf5
+  options:
+   output_file: "WC.hdf5"
+   group: "/WC"
+
+  # printer: ascii
+  # options:
+  #   output_file: "WC.dat"
+  #   buffer_length: 100
+  #   delete_file_on_restart: true
+```
 Run the example scan with:
 
 ```bash
 ./gambit -f /yaml_files/WC_lite.yaml
 ```
 
-GAMBIT will put your scan results in a local folder (`runs/`). Make sure you copy the contents of this folder into `/runs` (note the different placement of the forward slash!) before exiting the docker image.
+The scan will print a lot of stuff, including likelihoods and parameters at each point. You'll know that the scan was successful if it prints something like this:
+```
+Total log-likelihood: -1.3252244
+
+Diver run finished!
+ScannerBit is waiting for all MPI processes to report their shutdown condition...
+Final dataset size is 7600
+
+GAMBIT has finished successfully!
+
+Calling MPI_Finalize...
+```
+
+GAMBIT will put your scan results in a local folder (`runs/`). This folder should look like this:
+```
+runs/WC_lite/
+├── WC_lite.yaml
+├── logs
+│   ├── FlavBit.log
+│   ├── debug.log
+│   └── default.log
+├── samples
+│   └── WC.hdf5
+└── scanner_plugins
+    └── Diver
+        ├── native.devo
+        ├── native.raw
+        └── native.rparam
+```
+Feel free to inspect all files, in particular the `.log` files, which contain the output logs of all parts used in the scan.
+Make sure you copy the contents of this folder into `/runs` (note the different placement of the forward slash!) before exiting the docker image: `mv runs/* /runs/`
 
 ## Making plots
 
@@ -49,7 +94,7 @@ GAMBIT will put your scan results in a local folder (`runs/`). Make sure you cop
 
 If you can make the GAMBIT plotting framework [pippi](https://github.com/tegonzalo/pippi) work, you can make plots by simply calling:
 ```
-pippi /yaml_files/spartan.pip
+pippi /yaml_files/WC_lite.pip
 ```
 I haven't managed to do this yet though, so standalone python is fine :)
 
