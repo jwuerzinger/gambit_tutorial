@@ -116,3 +116,5 @@ This is a very large scan though, so make sure to increase the convergence thres
       convthresh: 1e-1
       verbosity: 1
 ```
+
+Question for you: Which parts of the scan could we disable here?
